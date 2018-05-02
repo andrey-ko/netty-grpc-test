@@ -131,6 +131,7 @@ message StopTimesSelector {
   oneof alts {
     TripSelector trip = 1;
     StopSelector stop = 2;
+    RouteSelector route = 3;
   }
 }
 
@@ -150,9 +151,16 @@ message ServicesSelector {
 
 message Agency {
   string id = 1;
+  string name = 2;
+  string url = 3;
+  string fareUrl = 4;
+  string timezone = 5;
+  string lang = 6;
+  string phone = 7;
+  string email = 8;
 }
 
-enum RouteType{
+enum RouteType {
   TRAM = 0;
   SUBWAY = 1;
   RAIL = 2;
@@ -176,33 +184,62 @@ message Route {
   //? sortOrder = 10;
 }
 
+enum TripDirection {
+  OUTBOUND = 0;
+  INBOUND = 1;
+}
 message Trip {
   string id = 1;
   string serviceId = 2;
+  string routeId = 3;
+  string shapeId = 4;
+  string headsign = 5;
+  string shortName = 6;
+  TripDirection direction = 7;
+  //wheelchair_accessible
+  //bikes_allowed
 }
 
 message StopTime {
   string tripId = 1;
   string stopId = 2;
   int32 seq = 3;
-  //arrival
-  //departure
-  float distanceTraveled = 6;
+  int32 arrival = 4;
+  int32 departure = 5;
+  string headsign = 6;
+  //PickupType PickupType = 7;
+  //DropOffType DropOffType = 8;
+  float shapeDistTraveled = 9;
+  //Timepoint timepoint =10;
+}
+
+message LatLng {
+  float lat = 1;
+  float lng = 2;
 }
 
 message Shape {
+  string id = 1;
+  repeated LatLng points = 2;
 }
 
 message Stop {
   string id = 1;
-  float lat = 2;
-  float lng = 3;
-  float name = 4;
-}
-
-message StopTrip {
+  string code = 2;
+  string name = 3;
+  float lat = 4;
+  float lng = 5;
+  //string zoneId = 6;
+  string url = 7;
+  //locationType locationType = 8;
+  //string parentStation = 9;
+  string timezone = 10;
+  //string wheelchairBoarding = 11;
 }
 
 message Service {
   string id = 1;
+  int64 startDate = 2;
+  int64 endDate = 3;
+  int32 mask = 4;
 }
