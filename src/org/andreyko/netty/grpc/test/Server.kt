@@ -15,10 +15,10 @@ object Server {
       .build()
     server.start()
     
-    log.info("server started, listening on $port")
+    log.info("server started, listening on port $port")
     Runtime.getRuntime().addShutdownHook(object : Thread() {
       override fun run() {
-        System.err.println("jvm is shutting down")
+        System.err.println("stopping server, reason: jvm is shutting down")
         server.shutdown()
       }
     })

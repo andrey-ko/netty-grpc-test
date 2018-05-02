@@ -1,5 +1,7 @@
 package org.andreyko.netty.grpc.test
 
+import com.google.protobuf.*
+import com.google.protobuf.Any
 import io.grpc.*
 import org.slf4j.*
 import java.util.concurrent.*
@@ -17,10 +19,8 @@ object Client {
       .build()
     
     val stub = GtfsLookupGrpc.newBlockingStub(channel)
-    val reply = stub.ping(PingRequest.newBuilder().apply {
-      message = "hello world!"
-    }.build())
-    println("server reply: '${reply.message}'")
+    val reply = stub.info(Empty.getDefaultInstance())
+    println("server reply: {\n$reply}")
     println("done")
     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
   }

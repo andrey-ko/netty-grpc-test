@@ -1,14 +1,17 @@
 package org.andreyko.netty.grpc.test
 
+import com.google.protobuf.*
 import io.grpc.stub.*
 
 class GtfsLookupService : GtfsLookupGrpc.GtfsLookupImplBase() {
   
-  override fun ping(request: PingRequest, responseObserver: StreamObserver<PingReply>) {
-    val reply = PingReply.newBuilder().apply {
-      message = request.message
-    }.build()
-    responseObserver.onNext(reply)
+  override fun info(request: Empty, responseObserver: StreamObserver<Info>) {
+    responseObserver.onNext(Info.newBuilder().apply {
+      name = MetaInfo.project
+      version = MetaInfo.version
+      api = MetaInfo.apiVersion
+      sha = MetaInfo.gitSha
+    }.build())
     responseObserver.onCompleted()
   }
 }

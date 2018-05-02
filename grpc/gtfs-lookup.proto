@@ -3,17 +3,206 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "org.andreyko.netty.grpc.test";
 option java_outer_classname = "GtfsLookupProto";
-package gtfs.lookup;
+package com.satori.scbe.gtfs.lookup;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/any.proto";
 
 service GtfsLookup {
-  rpc ping (PingRequest) returns (PingReply) {
+  /*rpc stats (Request) returns (Reply) {
+  }
+  rpc logs (Request) returns (Reply) {
+  }*/
+  rpc status (google.protobuf.Empty) returns (Status) {
+  }
+  rpc info (google.protobuf.Empty) returns (Info) {
+  }
+  
+  rpc getAgency (AgencySelector) returns (Agency) {
+  }
+  rpc getAgencies (AgenciesSelector) returns (stream Agency) {
+  }
+  rpc getRoute (RouteSelector) returns (Route) {
+  }
+  rpc getRoutes (RoutesSelector) returns (stream Route) {
+  }
+  rpc getTrip (TripSelector) returns (Trip) {
+  }
+  rpc getTrips (TripsSelector) returns (stream Trip) {
+  }
+  rpc getShape (ShapeSelector) returns (Shape) {
+  }
+  rpc getShapes (ShapesSelector) returns (stream Shape) {
+  }
+  rpc getStop (StopSelector) returns (Stop) {
+  }
+  rpc getStops (StopsSelector) returns (stream Stop) {
+  }
+  rpc getStopTimes (StopTimesSelector) returns (stream StopTime) {
+  }
+  rpc getService (ServiceSelector) returns (Service) {
+  }
+  rpc getServices (ServicesSelector) returns (stream Service) {
   }
 }
 
-message PingRequest {
-  string message = 1;
+message Status {
+  string name = 1;
+  string version = 2;
+  string api = 3;
+  string sha = 4;
 }
 
-message PingReply {
-  string message = 1;
+message Info {
+  string name = 1;
+  string version = 2;
+  string api = 3;
+  string sha = 4;
+}
+
+message AgencySelector {
+  oneof alts {
+    string id = 1;
+    RouteSelector route = 2;
+    TripSelector trip = 3;
+  }
+}
+
+message AgenciesSelector {
+  oneof alts {
+    string stopId = 1;
+  }
+}
+
+message RouteSelector {
+  oneof alts {
+    string id = 1;
+    TripSelector trip = 2;
+  }
+}
+
+message RoutesSelector {
+  oneof alts {
+    AgencySelector agency = 1;
+  }
+}
+
+message TripSelector {
+  oneof alts {
+    string id = 1;
+  }
+}
+
+message TripsSelector {
+  oneof alts {
+    AgencySelector agency = 1;
+    RouteSelector route = 2;
+  }
+}
+
+message ShapeSelector {
+  oneof alts {
+    string id = 1;
+    TripSelector trip = 2;
+  }
+}
+
+message ShapesSelector {
+  oneof alts {
+    AgencySelector agency = 1;
+    RouteSelector route = 2;
+  }
+}
+
+message StopSelector {
+  oneof alts {
+    string id = 1;
+  }
+}
+
+message StopsSelector {
+  oneof alts {
+    TripSelector trip = 1;
+    RouteSelector route = 2;
+  }
+}
+
+message StopTimesSelector {
+  oneof alts {
+    TripSelector trip = 1;
+    StopSelector stop = 2;
+  }
+}
+
+message ServiceSelector {
+  oneof alts {
+    string id = 1;
+    TripSelector trip = 2;
+  }
+}
+
+message ServicesSelector {
+  oneof alts {
+    TripSelector trip = 1;
+    RouteSelector route = 2;
+  }
+}
+
+message Agency {
+  string id = 1;
+}
+
+enum RouteType{
+  TRAM = 0;
+  SUBWAY = 1;
+  RAIL = 2;
+  BUS = 3;
+  FERRY = 4;
+  CABLE_CAR = 5;
+  GONDOLA = 6;
+  FUNICULAR = 7;
+}
+
+message Route {
+  string id = 1;
+  string agencyId = 2;
+  string shortName = 3;
+  string longName = 4;
+  string desc = 5;
+  RouteType type = 6;
+  string url = 7;
+  string color = 8;
+  string textColor = 9;
+  //? sortOrder = 10;
+}
+
+message Trip {
+  string id = 1;
+  string serviceId = 2;
+}
+
+message StopTime {
+  string tripId = 1;
+  string stopId = 2;
+  int32 seq = 3;
+  //arrival
+  //departure
+  float distanceTraveled = 6;
+}
+
+message Shape {
+}
+
+message Stop {
+  string id = 1;
+  float lat = 2;
+  float lng = 3;
+  float name = 4;
+}
+
+message StopTrip {
+}
+
+message Service {
+  string id = 1;
 }
