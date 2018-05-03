@@ -22,6 +22,6 @@ object Client {
     val reply = stub.info(Empty.getDefaultInstance())
     println("server reply: {\n$reply}")
     println("done")
-    channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+    channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
   }
 }
