@@ -1,3 +1,6 @@
+import org.gradle.api.internal.file.*
+import org.gradle.api.internal.file.collections.*
+
 gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
 
 buildscript {
@@ -8,6 +11,9 @@ buildscript {
   }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+
+    classpath "com.google.protobuf:protobuf-gradle-plugin:+"
+    classpath "com.google.gradle:osdetector-gradle-plugin:+"
 
     classpath "com.satori:satori-libs-gradle-utils:$composerVersion"
     classpath "com.satori:satori-libs-gradle-docker:$composerVersion"
@@ -36,7 +42,7 @@ idea {
 }
 
 ext {
-  pckg = "$group.${name.replaceAll(~/[^\w]+/,".")}"
+  pckg = "$group.${name.replaceAll(~/[^\w]+/, ".")}"
   pckgDir = pckg.replace('.', '/')
 }
 
@@ -125,15 +131,7 @@ task createDefaultProjectStructure {
   }
 }
 
-
 apply plugin: 'com.google.protobuf'
-sourceSets.main.proto.srcDirs = ['grpc']
-
-buildscript {
-  dependencies {
-    classpath "com.google.protobuf:protobuf-gradle-plugin:+"
-  }
-}
 
 protobuf {
   protoc {
@@ -146,7 +144,7 @@ protobuf {
   }
   generateProtoTasks {
     all()*.plugins {
-      grpc{
+      grpc {
 
       }
     }
@@ -181,4 +179,100 @@ dependencies {
 
   compile satoriLibsAsyncKotlin()
   compile satoriLibsCommonKotlin()
+
+  compile "com.google.protobuf:protobuf-gradle-plugin:+"
+}
+
+apply plugin: 'com.google.osdetector'
+
+
+/*sourceSets.all { sourceSet ->
+  sourceSet.extensions.create('proto', DefaultSourceDirectorySet, sourceSet.name, fileResolver, new DefaultDirectoryFileTreeFactory())
+}*/
+/*sourceSets.all { sourceSet ->
+  sourceSet.extensions.create('proto', ProtobufSourceDirectorySet, sourceSet.name, fileResolver)
+}*/
+sourceSets {
+  main {
+    proto {
+      srcDirs = ["grpc/include", "grpc/src"]
+    }
+  }
+}
+
+static String relativize(File base, File file){
+  return base.toURI().relativize(file.toURI()).toString()
+}
+
+String relativePath(File file){
+  return relativize(projectDir, file)
+}
+
+
+task extractProtos(type: Copy) {
+  group "codegen"
+  def cfg = project.configurations.detachedConfiguration()
+  cfg.dependencies.add(dependencies.create(
+    "com.google.protobuf:protobuf-java:$protobufVersion"
+  ))
+  def outDir = file("grpc/include")
+  inputs.files cfg
+  outputs.file outDir
+
+  from(zipTree(cfg.singleFile)) {
+    include "google/protobuf/**/*.proto"
+  }
+  into outDir
+
+  doFirst {
+    from().eachFile {
+      logger.lifecycle("copying '${it.path}' to '${relativePath(outDir)}'...")
+    }
+  }
+
+  clean.doFirst {
+    delete outDir
+  }
+
+}
+
+
+task generateProtoDescriptorSet {
+  group "codegen"
+  generateCode.dependsOn it
+  dependsOn extractProtos
+
+  def out = "grpc/.out/grpc.pb"
+
+  def cfg = project.configurations.detachedConfiguration()
+  cfg.dependencies.add(dependencies.create(
+    "com.google.protobuf:protoc:3.5.1:${osdetector.classifier}@exe"
+  ))
+
+  inputs.files cfg
+  inputs.file "grpc/gtfs-lookup.proto"
+
+  outputs.file out
+
+  doFirst {
+    delete out
+    exec {
+      commandLine = [
+        cfg.singleFile,
+        "--include_source_info",
+        "--descriptor_set_out=$out"
+      ]
+      commandLine += sourceSets.main.proto.srcDirs.collect {
+        "-I\"${relativePath(it)}\""
+      }
+      commandLine += fileTree("grpc/src") {
+        include "**/*.proto"
+      }.collect { "\"${file("grpc/src").toURI().relativize(it.toURI())}\"" }
+      logger.lifecycle("> ${commandLine.join(' ')}")
+    }
+  }
+
+  clean.doFirst {
+    delete out
+  }
 }

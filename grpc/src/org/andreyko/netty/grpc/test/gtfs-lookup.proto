@@ -144,8 +144,7 @@ message ServiceSelector {
 
 message ServicesSelector {
   oneof alts {
-    TripSelector trip = 1;
-    RouteSelector route = 2;
+    RouteSelector route = 1;
   }
 }
 
