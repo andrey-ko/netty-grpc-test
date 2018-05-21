@@ -71,7 +71,7 @@ try {
       println "> ${commandLine.join(' ')}"
     }
     gitSha = new Scanner(os.toString()).nextLine()
-    println "gitSha: ${model.sha}"
+    println "gitSha: ${gitSha}"
   }
 } catch (e) {
   println "failed to get current commit SHA: $e"
@@ -86,7 +86,7 @@ try {
       println "> ${commandLine.join(' ')}"
     }
     gitTags = os.toString().split('\n').findAll { !it.isAllWhitespace() }
-    println "gitTags: ${model.tags}"
+    println "gitTags: ${gitTags}"
   }
 } catch (e) {
   println "failed to get git tags: $e"
@@ -257,7 +257,6 @@ subprojects {
     compile "io.grpc:grpc-protobuf:$grpcVersion"
     compile "io.grpc:grpc-netty:$grpcVersion"
 
-    compile satoriLibsVertxKotlin()
     compile satoriLibsAsyncKotlin()
     compile satoriLibsCommonKotlin()
 
@@ -266,6 +265,11 @@ subprojects {
 
     compile "com.google.protobuf:protobuf-java:$protobufVersion"
 
+  }
+
+  // test dependencies
+  dependencies {
+    testCompile "junit:junit:$junitVersion"
   }
 
   // kapt dependencies

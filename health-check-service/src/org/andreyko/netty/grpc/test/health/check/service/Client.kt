@@ -1,7 +1,8 @@
-package org.andreyko.asdsad.gtfs.lookup.service
+package org.andreyko.netty.grpc.test.health.check.service
 
 import com.google.protobuf.*
 import io.grpc.*
+import org.andreyko.vertx.protobuf.services.health.check.service.*
 import org.slf4j.*
 import java.util.concurrent.*
 
@@ -17,10 +18,11 @@ object Client {
       .usePlaintext()
       .build()
     
-    val stub = GtfsLookupGrpc.newBlockingStub(channel)
-    val reply = stub.info(Empty.getDefaultInstance())
+    val stub = HealthCheckGrpc.newBlockingStub(channel)
+    val reply = stub.status(Empty.getDefaultInstance())
     println("server reply: {\n$reply}")
     println("done")
-    channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+    channel.shutdown()
+    channel.awaitTermination(5, TimeUnit.SECONDS)
   }
 }

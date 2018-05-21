@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ${archivesBaseName}
+spec:
+  containers:
+    - name: ${archivesBaseName}
+      image: ${archivesBaseName}:${version.toLowerCase()}
+      imagePullPolicy: Never
+      args: [
+        "--port", "8080",
+        "--gtfs-lookup.host", "${project(":gtfs-lookup-service").archivesBaseName}",
+        "--gtfs-lookup.port", "8080",
+        "--organization.host", "${project(":organization-service").archivesBaseName}",
+        "--organization.port", "8080"
+      ]
+  restartPolicy: Always

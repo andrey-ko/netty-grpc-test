@@ -1,0 +1,31 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: ${archivesBaseName}
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: ${archivesBaseName}
+    spec:
+      containers:
+        - name: ${archivesBaseName}
+          image: ${archivesBaseName}:${version.toLowerCase()}
+          args: ["--port", "8080"]
+          imagePullPolicy: Never
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ${archivesBaseName}
+spec:
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: ${archivesBaseName}
+  sessionAffinity: None
+  type: ClusterIP

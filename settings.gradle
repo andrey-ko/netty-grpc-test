@@ -1,5 +1,6 @@
 rootProject.name = 'netty-grpc-test'
 
+include ':utils'
 include ':api-gateway'
 include ':health-check-service'
 include ':gtfs-lookup-service'

@@ -1,0 +1,25 @@
+task dockerPrepare {
+  group "docker"
+}
+
+task generateDockerFile(type: TransformTask) {
+  group "codegen"
+  template = rootProject.file("dockerfile.template")
+  output = file("Dockerfile")
+  outputs.upToDateWhen { false }
+}
+
+// copy docker file
+installDist {
+  inputs.file "Dockerfile"
+  outputs.file new File(destinationDir, "Dockerfile")
+  doLast {
+    copy {
+      from "Dockerfile"
+      into destinationDir
+    }
+  }
+  clean.doFirst {
+    delete new File(destinationDir, "Dockerfile")
+  }
+}

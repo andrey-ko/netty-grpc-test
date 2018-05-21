@@ -1,0 +1,31 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: gtfs-lookup-service
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: gtfs-lookup-service
+    spec:
+      containers:
+        - name: gtfs-lookup-service
+          image: gtfs-lookup-service:0.0.4-snapshot
+          args: ["--port", "8080"]
+          imagePullPolicy: Never
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: gtfs-lookup-service
+spec:
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: gtfs-lookup-service
+  sessionAffinity: None
+  type: ClusterIP

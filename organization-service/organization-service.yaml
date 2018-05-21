@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: organization-service
+spec:
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        service: organization-service
+    spec:
+      containers:
+        - name: organization-service
+          image: organization-service:0.0.4-snapshot
+          args: ["--port", "8080"]
+          imagePullPolicy: Never
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: organization-service
+spec:
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: organization-service
+  type: ClusterIP
+  clusterIP: None
+  #sessionAffinity: None

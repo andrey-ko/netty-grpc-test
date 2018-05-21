@@ -54,6 +54,10 @@ task generateKubeConfig(type: TransformTask) {
 // main dependencies
 dependencies {
   compile project(":utils")
+  compile project(":gtfs-lookup-service")
+  compile project(":organization-service")
+
+  compile "io.fabric8:kubernetes-client:$kubernetesClientVersion"
 }
 
 // test dependencies
