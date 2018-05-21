@@ -43,7 +43,20 @@ allprojects {
     }
   }
 }
+
+task build{
+  group "build"
+}
+
+task generateCode{
+  group "codegen"
+
+  build.dependsOn it
+}
+
 apply plugin: "com.satori.codegen"
+apply from: rootProject.file("readme.gradle")
+
 ext {
   pckg = "$group.${codeFormatter.packageName(project.name)}"
   pckgDir = pckg.replace('.', '/')
