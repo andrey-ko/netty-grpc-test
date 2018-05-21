@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: health-check-service
-      image: health-check-service:0.0.4-snapshot
+      image: health-check-service:0.0.6-snapshot
       imagePullPolicy: Never
       args: [
         "--port", "8080",

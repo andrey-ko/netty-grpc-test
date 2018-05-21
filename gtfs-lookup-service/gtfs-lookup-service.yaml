@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: gtfs-lookup-service
-          image: gtfs-lookup-service:0.0.4-snapshot
+          image: gtfs-lookup-service:0.0.6-snapshot
           args: ["--port", "8080"]
           imagePullPolicy: Never
 ---

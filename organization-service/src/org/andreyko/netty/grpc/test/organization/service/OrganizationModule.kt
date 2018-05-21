@@ -19,7 +19,7 @@ class OrganizationModule {
     log.info("creating organization client...")
     
     val nameResolver = DnsNameResolverProvider()
-    val channel = NettyChannelBuilder.forTarget("dns://${cfg.host}:${cfg.port}")
+    val channel = NettyChannelBuilder.forTarget("dns:///${cfg.host}:${cfg.port}")
       .eventLoopGroup(eventLoopGroup)
       .nameResolverFactory(nameResolver)
       .loadBalancerFactory(RoundRobinLoadBalancerFactory.getInstance())

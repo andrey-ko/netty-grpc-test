@@ -40,12 +40,14 @@ class HealthCheckService @Inject constructor(
   
   fun doCheck() {
     this.timerFuture = null
+  
+    log.info("checking services...")
     
     val afj = AsyncForkJoin()
     
     afj.fork {
       val result = try {
-        val reply = awaitStreamOberver<org.andreyko.netty.grpc.test.gtfs.lookup.service.Status> { observer ->
+        val reply = awaitStreamObserver<org.andreyko.netty.grpc.test.gtfs.lookup.service.Status> { observer ->
           gtfsLookupService.status(Empty.getDefaultInstance(), observer)
         }
         log.info("reply message: '$reply'")
@@ -59,7 +61,7 @@ class HealthCheckService @Inject constructor(
     
     afj.fork {
       val result = try {
-        val reply = awaitStreamOberver<org.andreyko.netty.grpc.test.organization.service.Status> { observer ->
+        val reply = awaitStreamObserver<org.andreyko.netty.grpc.test.organization.service.Status> { observer ->
           organizationService.status(Empty.getDefaultInstance(), observer)
         }
         log.info("reply message: '$reply'")
@@ -73,7 +75,7 @@ class HealthCheckService @Inject constructor(
     
     afj.fork {
       val result = try {
-        val reply = awaitStreamOberver<org.andreyko.vertx.protobuf.services.health.check.service.Status>{ observer ->
+        val reply = awaitStreamObserver<org.andreyko.vertx.protobuf.services.health.check.service.Status>{ observer ->
           status(Empty.getDefaultInstance(), observer)
         }
         log.info("reply message: '$reply'")
@@ -85,11 +87,12 @@ class HealthCheckService @Inject constructor(
       status.put("health-check-service", result)
     }
     
-    afj.fork {
-      kubeClient
-    }
+   /* afj.fork {
+      kubeClient.pods()
+    }*/
     
     afj.join().onCompleted { ar ->
+      log.info("schedule next check in 1000 ms.")
       timerFuture = workerGroup.schedule(::doCheck, 1, TimeUnit.SECONDS)
     }
   }
@@ -105,7 +108,7 @@ class HealthCheckService @Inject constructor(
     responseObserver.onCompleted()
   }
   
-  suspend inline fun <reified T> awaitStreamOberver(crossinline block: (StreamObserver<T>) -> Unit): T {
+  suspend inline fun <reified T> awaitStreamObserver(crossinline block: (StreamObserver<T>) -> Unit): T {
     return suspendCoroutine { cont ->
       block(object : StreamObserver<T> {
         var completed = false
